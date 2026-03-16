@@ -1,28 +1,8 @@
-import { config, roleHierarchy } from '../config.js';
+import { config } from '../config.js';
 
 interface GroupTestResult {
   isMember: boolean;
   role?: string;
-}
-
-/**
- * Test if a DID is a member of a group via Gatekeeper API
- */
-async function testGroup(groupDid: string, memberDid: string): Promise<boolean> {
-  try {
-    const url = `${config.gatekeeperUrl}/api/v1/did/${encodeURIComponent(groupDid)}/test/${encodeURIComponent(memberDid)}`;
-    const response = await fetch(url);
-    
-    if (!response.ok) {
-      return false;
-    }
-    
-    const result = await response.json();
-    return result === true || result?.member === true;
-  } catch (error) {
-    console.error(`Error testing group membership: ${error}`);
-    return false;
-  }
 }
 
 /**
@@ -41,6 +21,50 @@ export async function resolveDid(did: string): Promise<any> {
   } catch (error) {
     console.error(`Error resolving DID: ${error}`);
     return null;
+  }
+}
+
+/**
+ * Test if a DID is a member of a group by resolving the group DID
+ * and checking the members array. Supports recursive group membership.
+ */
+async function testGroup(groupDid: string, memberDid: string, visited: Set<string> = new Set()): Promise<boolean> {
+  // Prevent infinite loops
+  if (visited.has(groupDid)) {
+    return false;
+  }
+  visited.add(groupDid);
+  
+  try {
+    const doc = await resolveDid(groupDid);
+    if (!doc) {
+      return false;
+    }
+    
+    const members = doc.didDocumentData?.group?.members || [];
+    
+    // Direct membership check
+    if (members.includes(memberDid)) {
+      return true;
+    }
+    
+    // Recursive check - member groups (for hierarchy like Admin ⊂ Moderator ⊂ Member)
+    for (const member of members) {
+      // Check if this member is a group that contains our target
+      const memberDoc = await resolveDid(member);
+      if (memberDoc?.didDocumentData?.group) {
+        // It's a group - check recursively
+        const inSubgroup = await testGroup(member, memberDid, visited);
+        if (inSubgroup) {
+          return true;
+        }
+      }
+    }
+    
+    return false;
+  } catch (error) {
+    console.error(`Error testing group membership: ${error}`);
+    return false;
   }
 }
 
