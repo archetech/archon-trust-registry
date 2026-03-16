@@ -1,0 +1,45 @@
+{
+  "name": "@archon-protocol/trust-registry",
+  "version": "0.1.0",
+  "description": "ToIP-compliant Trust Registry Query Protocol (TRQP) implementation for Archon",
+  "type": "module",
+  "main": "build/index.js",
+  "bin": {
+    "archon-trust-registry": "build/index.js"
+  },
+  "scripts": {
+    "start": "node build/index.js",
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "trqp",
+    "trust-registry",
+    "toip",
+    "archon",
+    "did",
+    "decentralized-identity",
+    "verifiable-credentials"
+  ],
+  "author": "Archetech <info@archetech.com>",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/archetech/archon-trust-registry.git"
+  },
+  "homepage": "https://archon.technology",
+  "dependencies": {
+    "express": "^5.0.1",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.15.2",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

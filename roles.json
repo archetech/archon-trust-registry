@@ -1,0 +1,23 @@
+{
+  "$schema": "./roles.schema.json",
+  "description": "Role to action mapping for the trust registry",
+  "roles": {
+    "owner": {
+      "actions": ["issue", "verify", "hold", "present", "revoke"],
+      "description": "Full control over the registry"
+    },
+    "admin": {
+      "actions": ["issue", "verify", "hold", "present", "revoke"],
+      "description": "Can issue and revoke credentials"
+    },
+    "moderator": {
+      "actions": ["verify", "hold", "present"],
+      "description": "Can verify and present credentials"
+    },
+    "member": {
+      "actions": ["verify", "hold", "present"],
+      "description": "Basic credential operations"
+    }
+  },
+  "defaultRole": "member"
+}
