@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { config } from '../config.js';
 import { checkAuthorization } from '../lib/gatekeeper-client.js';
+import { resolveToDID, isDID } from '../lib/name-resolver.js';
 
 const router = Router();
 
@@ -9,8 +10,8 @@ const router = Router();
  * GET /trqp/v1/authorization
  * 
  * Query params:
- *   - authority_id: DID of the governing authority
- *   - entity_id: DID of the entity being queried
+ *   - authority_id: DID or name of the governing authority (e.g., "archon-social")
+ *   - entity_id: DID or name of the entity being queried (e.g., "genitrix")
  *   - action: Action type (issue, verify, hold, present, revoke)
  *   - resource: (optional) Schema DID or credential type
  */
@@ -28,8 +29,19 @@ router.get('/', async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'Missing required parameter: action' });
   }
   
+  // Resolve names to DIDs
+  const resolvedAuthority = await resolveToDID(authority_id as string);
+  const resolvedEntity = await resolveToDID(entity_id as string);
+  
+  if (!resolvedAuthority) {
+    return res.status(400).json({ error: `Could not resolve authority: ${authority_id}` });
+  }
+  if (!resolvedEntity) {
+    return res.status(400).json({ error: `Could not resolve entity: ${entity_id}` });
+  }
+  
   // Validate authority_id matches this registry
-  if (authority_id !== config.registryDid) {
+  if (resolvedAuthority !== config.registryDid) {
     return res.status(400).json({ 
       error: `This registry only serves authority: ${config.registryDid}` 
     });
@@ -44,7 +56,7 @@ router.get('/', async (req: Request, res: Response) => {
   
   try {
     const result = await checkAuthorization(
-      entity_id as string,
+      resolvedEntity,
       action as string,
       resource as string | undefined
     );
@@ -52,8 +64,8 @@ router.get('/', async (req: Request, res: Response) => {
     if (result.authorized) {
       return res.json({
         authorized: true,
-        authority_id,
-        entity_id,
+        authority_id: resolvedAuthority,
+        entity_id: resolvedEntity,
         action,
         resource: resource || null,
         statement: {
