@@ -1,6 +1,6 @@
 {
   "name": "@archon-protocol/trust-registry",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "ToIP-compliant Trust Registry Query Protocol (TRQP) implementation for Archon",
   "type": "module",
   "main": "build/index.js",

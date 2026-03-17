@@ -1,6 +1,8 @@
 # Archon Trust Registry
 
-**ToIP-compliant Trust Registry Query Protocol (TRQP) implementation powered by Archon Protocol.**
+**ToIP TRQP v2.0 compliant Trust Registry powered by Archon Protocol.**
+
+[![TRQP v2.0](https://img.shields.io/badge/TRQP-v2.0-green.svg)](https://trustoverip.github.io/tswg-trust-registry-protocol/)
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
@@ -28,34 +30,64 @@ cp .env.example .env
 npm run dev
 ```
 
-## API Endpoints
+## API Endpoints (ToIP TRQP v2.0)
 
-### Authorization Query
+### Authorization Query (Normative)
 *"Can entity X do action Y?"*
 
 ```http
-GET /trqp/v1/authorization?authority_id=<registry-did>&entity_id=<entity-did>&action=issue&resource=MembershipCredential
+POST /authorization
+Content-Type: application/json
+
+{
+  "authority_id": "archon-social",
+  "entity_id": "flaxscrip", 
+  "action": "issue",
+  "resource": "MembershipCredential",
+  "context": { "time": "2026-03-17T10:00:00Z" }
+}
 ```
 
 **Response:**
 ```json
 {
+  "entity_id": "did:cid:bagaaiera...",
+  "authority_id": "did:cid:bagaaiera...",
+  "action": "issue",
+  "resource": "MembershipCredential",
   "authorized": true,
-  "statement": { "type": "GroupMembership", "role": "admin" }
+  "time_requested": "2026-03-17T10:00:00Z",
+  "time_evaluated": "2026-03-17T10:00:00Z",
+  "message": "did:cid:... is authorized for issue+MembershipCredential (role: admin)."
 }
 ```
 
-### Recognition Query
-*"Do we trust authority Y?"*
+### Recognition Query (Normative)
+*"Do we recognize authority Y?"*
 
 ```http
-GET /trqp/v1/recognition?authority_id=<registry-did>&recognized_authority_id=<other-authority-did>
+POST /recognition
+Content-Type: application/json
+
+{
+  "authority_id": "archon-social",
+  "entity_id": "did:web:riaa.com",
+  "action": "recognize",
+  "resource": "MusicRights"
+}
 ```
 
 ### Metadata
 *"What does this registry govern?"*
 
 ```http
+GET /metadata
+```
+
+### Legacy GET Endpoints (Backwards Compatible)
+```http
+GET /trqp/v1/authorization?authority_id=...&entity_id=...&action=...
+GET /trqp/v1/recognition?authority_id=...&recognized_authority_id=...
 GET /trqp/v1/metadata
 ```
 
