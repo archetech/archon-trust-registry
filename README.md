@@ -98,6 +98,7 @@ GET /trqp/v1/metadata
 | `REGISTRY_DID` | DID of this trust registry | required |
 | `REGISTRY_NAME` | Human-readable name | `Archon Trust Registry` |
 | `GATEKEEPER_URL` | Archon Gatekeeper API | `https://archon.technology` |
+| `HERALD_REGISTRY_URL` | Herald registry used to resolve names | `https://archon.social/api/registry` |
 | `PORT` | Server port | `4260` |
 | `OWNER_GROUP` | DID of owner group | - |
 | `ADMIN_GROUP` | DID of admin group | - |

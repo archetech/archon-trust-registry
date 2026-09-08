@@ -10,8 +10,9 @@ const CACHE_TTL = 60000; // 1 minute
  */
 async function refreshNameCache(): Promise<void> {
   try {
-    // Use archon.social registry endpoint
-    const registryUrl = 'https://archon.social/api/registry';
+    // Herald registry endpoint (any Herald: archon.social by default, or the
+    // one governing this authority's namespace)
+    const registryUrl = config.heraldRegistryUrl;
     const response = await fetch(registryUrl);
     
     if (!response.ok) {

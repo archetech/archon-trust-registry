@@ -20,6 +20,9 @@ export interface Config {
   
   // Gatekeeper
   gatekeeperUrl: string;
+
+  // Herald registry used to resolve names to DIDs
+  heraldRegistryUrl: string;
   
   // Resource format
   resourceFormat: 'did' | 'name' | 'both';
@@ -46,6 +49,7 @@ export const config: Config = {
   registryDid: process.env.REGISTRY_DID || '',
   registryName: process.env.REGISTRY_NAME || 'Archon Trust Registry',
   gatekeeperUrl: process.env.GATEKEEPER_URL || 'https://archon.technology',
+  heraldRegistryUrl: process.env.HERALD_REGISTRY_URL || 'https://archon.social/api/registry',
   resourceFormat: (process.env.RESOURCE_FORMAT as Config['resourceFormat']) || 'both',
   port: parseInt(process.env.PORT || '4260', 10),
   
